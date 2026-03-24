@@ -1,7 +1,7 @@
 import React from 'react';
 import { BadgeCheck, Brain, TrendingUp, Bell, Search, Menu, User } from 'lucide-react';
 
-export default function Navbar() {
+export default function Navbar({ onSearch }) {
   return (
     <nav className="navbar">
       <div className="nav-container">
@@ -12,7 +12,19 @@ export default function Navbar() {
         
         <div className="nav-search">
           <Search size={18} className="search-icon" />
-          <input type="text" placeholder="Search stocks, signals, or patterns..." />
+          <input 
+            type="text" 
+            placeholder="Search stocks, signals, or patterns..." 
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                if (onSearch) onSearch(e.target.value);
+                else {
+                  // Fallback global event if onSearch isn't passed yet
+                  window.dispatchEvent(new CustomEvent('globalSearch', { detail: e.target.value }));
+                }
+              }
+            }}
+          />
         </div>
 
         <div className="nav-actions">

@@ -7,7 +7,7 @@ import Badge from '../components/common/Badge';
 import { useWatchlist } from '../hooks/useWatchlist';
 import { Loader2 } from 'lucide-react';
 
-export default function WatchlistPage({ onBack }) {
+export default function WatchlistPage({ onNavigate }) {
   const { watchlist, loading, error } = useWatchlist();
 
 
@@ -15,7 +15,7 @@ export default function WatchlistPage({ onBack }) {
     <div className="app-container">
       <Navbar />
       <div className="main-wrapper">
-        <Sidebar onNavigate={onBack} />
+        <Sidebar onNavigate={onNavigate} />
         <PageContainer>
            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
              <h1>My Watchlist</h1>

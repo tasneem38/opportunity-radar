@@ -7,15 +7,26 @@ import SignalCard from '../components/signal/SignalCard';
 import { useSignals } from '../hooks/useSignals';
 import { Loader2, Radar, Filter } from 'lucide-react';
 
-export default function SignalsPage({ onNavigate }) {
+export default function SignalsPage({ onNavigate, searchQuery }) {
   const { signals, loading, error } = useSignals();
   const [activeFilter, setActiveFilter] = useState('All');
 
   const categories = ['All', ...new Set(signals.map(s => s.category || 'General'))];
   
-  const filteredSignals = activeFilter === 'All' 
-    ? signals 
-    : signals.filter(s => (s.category || 'General') === activeFilter);
+  const filteredSignals = signals.filter(s => {
+    // 1. Category Filter
+    if (activeFilter !== 'All' && (s.category || 'General') !== activeFilter) return false;
+    
+    // 2. Search Query Filter
+    if (!searchQuery) return true;
+    const term = searchQuery.toLowerCase();
+    const symbol = (s.stock_symbol || (s.stocks && s.stocks.symbol) || '').toLowerCase();
+    const company = (s.company_name || (s.stocks && s.stocks.company_name) || '').toLowerCase();
+    const summary = (s.signal_summary || s.category || '').toLowerCase();
+    const details = (s.action_suggestion || s.signal_text || '').toLowerCase();
+    
+    return symbol.includes(term) || company.includes(term) || summary.includes(term) || details.includes(term);
+  });
 
 
   return (

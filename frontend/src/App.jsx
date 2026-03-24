@@ -8,9 +8,12 @@ import SignalsPage from './pages/SignalsPage';
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedSignal, setSelectedSignal] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const navigate = (page, data = null) => {
-    console.log(`App Navigating to ${page}`, data);
+    if (page === 'signals') {
+      setSearchQuery(''); // clear search on normal nav to signals
+    }
     if (data) setSelectedSignal(data);
     if (page === 'detail' && !data && !selectedSignal) {
       console.warn("Detail navigation blocked: no signal data");
@@ -20,15 +23,20 @@ export default function App() {
     setCurrentPage(page);
   };
 
-
-
-  return (
+  React.useEffect(() => {
+    const handleSearch = (e) => {
+      setSearchQuery(e.detail);
+      setCurrentPage('signals');
+    };
+    window.addEventListener('globalSearch', handleSearch);
+    return () => window.removeEventListener('globalSearch', handleSearch);
+  }, []);  return (
     <div className="app-root">
       {currentPage === 'home' && <HomePage onNavigate={navigate} />}
-      {currentPage === 'signals' && <SignalsPage onNavigate={navigate} />}
+      {currentPage === 'signals' && <SignalsPage onNavigate={navigate} searchQuery={searchQuery} />}
       {currentPage === 'detail' && <SignalDetailPage signal={selectedSignal} onBack={() => setCurrentPage('signals')} />}
       {currentPage === 'watchlist' && <WatchlistPage onNavigate={navigate} />}
-      {currentPage === 'backtest' && <BacktestPage onBack={() => setCurrentPage('home')} />}
+      {currentPage === 'backtest' && <BacktestPage onNavigate={navigate} />}
     </div>
   );
 }

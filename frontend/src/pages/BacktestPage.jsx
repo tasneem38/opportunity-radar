@@ -5,7 +5,7 @@ import PageContainer from '../components/layout/PageContainer';
 import BacktestChart from '../components/charts/BacktestChart';
 import { Play, Loader2, Calendar, Target, TrendingUp } from 'lucide-react';
 
-export default function BacktestPage({ onBack }) {
+export default function BacktestPage({ onNavigate }) {
   const [config, setConfig] = useState({ symbol: 'RELIANCE', start: '2024-01-01', end: '2024-03-24' });
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
@@ -28,7 +28,7 @@ export default function BacktestPage({ onBack }) {
     <div className="app-container">
       <Navbar />
       <div className="main-wrapper">
-        <Sidebar onNavigate={onBack} />
+        <Sidebar onNavigate={onNavigate} />
         <PageContainer>
           <div className="backtest-header" style={{ marginBottom: '2rem' }}>
             <h1 style={{ fontSize: '1.875rem', fontWeight: 800 }}>Backtest Lab</h1>

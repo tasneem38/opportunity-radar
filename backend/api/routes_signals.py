@@ -38,11 +38,15 @@ def get_watchlist():
             symbol = stock.get("symbol")
             price_data = YFinanceClient.get_stock_data(symbol, period="1d")
             change = YFinanceClient.get_price_change_pct(symbol)
+            # Fetch actual AI Sentiment from the latest signal
+            res_signal = db.client.table("signals").select("historical_context").eq("stock_id", stock["id"]).order("created_at", desc=True).limit(1).execute()
+            ai_sentiment = res_signal.data[0].get("historical_context", "Neutral") if res_signal.data else ("Bullish" if change > 0 else "Neutral")
+
             enriched.append({
                 "symbol": symbol,
                 "price": price_data.get("current_price", 0),
                 "change": f"{'+' if change >= 0 else ''}{round(change, 2)}%",
-                "sentiment": "Bullish" if change > 0 else "Neutral"
+                "sentiment": ai_sentiment
             })
     return enriched
 
