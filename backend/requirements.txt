@@ -15,6 +15,7 @@ python-dotenv
 loguru
 redis
 google-generativeai
-
+resend
+twilio
 pypdf
 pymupdf

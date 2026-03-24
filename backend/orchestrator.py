@@ -13,6 +13,7 @@ from data.nse_client import NSEClient
 from data.yfinance_client import YFinanceClient
 from data.screener_client import ScreenerClient
 
+from notifier import dispatch_alert
 from agents.filing_watcher import FilingWatcherAgent
 from agents.signal_scorer import SignalScorerAgent
 from agents.tasks import TaskBuilder
@@ -137,7 +138,7 @@ class OpportunityRadarOrchestrator:
                     }).execute()
 
                     # 4. Final Signal
-                    db.insert_signal({
+                    signal_data = {
                         "stock_id": stock_id,
                         "stock_symbol": symbol,
                         "company_name": s.get("company_name", s.get("stock_symbol", "UNKNOWN")),
@@ -146,7 +147,22 @@ class OpportunityRadarOrchestrator:
                         "confidence_score": float(s.get("score") or s.get("confidence_score") or s.get("conviction_score") or 7.2),
                         "sentiment": s.get("sentiment", "Neutral"),
                         "metadata": s
-                    })
+                    }
+                    db.insert_signal(signal_data)
+
+                    # 5. Dispatch alerts (Email >= 7 | WhatsApp >= 9)
+                    try:
+                        dispatch_signal = {
+                            "conviction_score": signal_data["confidence_score"],
+                            "stock_symbol": symbol,
+                            "stocks": {"symbol": symbol},
+                            "signal_summary": s.get("signal", s.get("action", "New material signal detected")),
+                            "action_suggestion": s.get("action", "Review signal on the dashboard.")
+                        }
+                        dispatch_alert(dispatch_signal)
+                    except Exception as notify_err:
+                        logger.warning(f"Alert dispatch failed (non-critical): {notify_err}")
+
                 logger.info(f"Successfully stored {len(signals)} signals in database.")
                 
             except Exception as parse_err:
