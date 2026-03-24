@@ -3,93 +3,114 @@
 > **Empowering Investors with Multi-Agent Intelligence.**  
 > *Developed for the ET Gen AI Hackathon 2026*
 
-Opportunity Radar is a production-grade intelligence portal that autonomously monitors BSE/NSE corporate disclosures, institutional bulk deals, and market sentiment. By leveraging a **self-orchestrating swarm of AI agents (CrewAI)**, the platform filters through thousand of routine filings to extract high-conviction "Material Alpha" in real-time.
+Opportunity Radar is a production-grade market intelligence portal that autonomously monitors BSE/NSE corporate disclosures, institutional bulk deals, and market sentiment. By leveraging a **self-orchestrating swarm of 5 AI agents (powered by CrewAI, Sarvam AI, and Gemini)**, the platform filters through thousands of routine filings to extract high-conviction "Material Alpha" in real-time.
 
 ---
 
-## 🚀 Core Features
+## 🚀 Core Platform Features
 
-### 1. Live Intelligence Radar
-A glassmorphism-inspired dashboard that displays real-time "Convergence Signals." Each signal is the result of multiple AI agents reaching consensus on a corporate event.
-- **Dynamic Filtering**: Filter by Sector (Tech, Energy, Finance) or Category (Mergers, Earnings, Insider Activity).
-- **Conviction Scoring**: Signals are scored 0–10 based on institutional impact, not just sentiment.
+### 1. The Intelligence Portal (Frontend)
+A premium, responsive React dashboard featuring four primary views:
+- **Dashboard**: Real-time NIFTY/SENSEX market stats and the Top 5 most recent high-conviction signals.
+- **Live Signals (Radar)**: A comprehensive feed of all agent-generated alerts with dynamic filtering by sector, category, and intelligent search.
+- **Watchlist**: Track specific stocks with AI sentiment dynamically mapped from the latest intelligence signals (`Bullish`, `Bearish`, `Neutral`).
+- **Backtest Lab**: Validate signal precision. Replay our proprietary SMA 20/50 "Golden Cross" detection algorithm against historical price action to simulate win rates and equity curves.
 
-### 2. The Convergence Lab (Backtest)
-Validate the radar's precision by replaying historical agent logic on past market data.
-- **Simulation Engine**: Select any ticker and date range to see how the agents *would have* scored historical filings.
-- **Equity Curve**: Visualize the theoretical performance of AI-driven signals against actual historical price action.
+### 2. Multi-Channel Alert System
+High-conviction alerts are autonomously routed directly to investors:
+- **Email (Resend)**: Triggered for signals with a Conviction Score ≥ 7.0.
+- **WhatsApp (Twilio)**: Immediate priority delivery for extreme conviction signals (Score ≥ 9.0).
+- *Both channels format alerts identically to the specified PRD templates.*
 
-### 3. Agentic Audit Trail
-Total transparency. Every signal in the database is linked to the specific raw filing and the specific agent thought-process that generated it.
+### 3. Absolute Auditability (Database)
+The system is designed for 100% traceability via Supabase PostgreSQL:
+- **`raw_events`**: The original, unmodified JSON scraped from the exchanges.
+- **`agent_outputs`**: The raw "thoughts", reasoning, and sentiment of individual agents.
+- **`signals`**: The final, synthesized intelligence result shown to the user.
 
 ---
 
-## 🧠 Agent Architecture (The Swarm)
+## 🧠 Hybrid Swarm Architecture
 
-We utilize a **Hierarchical Multi-Agent System** powered by `CrewAI` and `Gemini 1.5 Flash`.
+We utilize a **Hierarchical Multi-Agent System** that splits cognitive load for maximum efficiency and minimum latency.
 
 ```mermaid
 graph TD
-    A[BSE/NSE Data Feed] --> B{Orchestrator}
-    B --> C[Filing Watcher Agent]
-    B --> D[Bulk Deal Analyzer]
-    C --> E[Materiality Scoring]
-    D --> E
-    E --> F[Consensus Agent]
-    F --> G[(Supabase DB)]
-    G --> H[React Frontend]
+    Data[Market Data Streams: BSE, NSE, Screener] --> Orch{Orchestrator}
+    Orch --> A[Filing Watcher]
+    Orch --> B[Deal Tracker]
+    Orch --> C[Results Analyzer]
+    Orch --> D[Sentiment Analyzer]
+    A & B & C & D --> E[Signal Scorer Agent]
+    E --> DB[(Supabase Audit DB)]
+    DB --> UI[React Frontend]
+    DB --> Notify[Resend/Twilio Alerts]
 ```
 
-### The Agents:
-1.  **BSE Filing Analyst**: Trained to distinguish between "Routine Administrative" and "Material Impactful" disclosures (e.g., distinguishing a boilerplate board meeting from a surprise acquisition).
-2.  **Institutional Flow Agent**: Monitors 'Bulk & Block' deals to identify "Smart Money" accumulation patterns.
-3.  **Signal Conviction Scorer**: The final intelligence layer. It synthesizes diverging viewpoints from other agents into a single, actionable conviction score.
+### The 5 Agents
+1. **BSE Filing Analyst** *(Powered by Gemini 1.5 Flash)*: Chews through high-volume corporate announcements to distinguish "Routine Administrative" from "Material Impactful" disclosures.
+2. **Institutional Deal Tracker** *(Powered by Gemini 1.5 Flash)*: Monitors NSE 'Bulk & Block' deals to identify "Smart Money" accumulation and distribution patterns.
+3. **Results Analyzer**: Parses quarterly earnings (Screener.in) to identify PAT beats and margin expansions.
+4. **Management Sentiment Analyzer**: Extracts forward-looking confidence metrics from earnings concall transcripts.
+5. **Signal Conviction Scorer** *(Powered by Sarvam-M 24B)*: The final intelligence layer. Synthesizes the diverging viewpoints of all other agents into a single, definitive conviction score (0-10) and determines the final `action_suggestion`.
 
 ---
 
 ## 🛠 Technical Stack
 
-- **Intelligence**: Sarvam-M 24B (Multi-Agent Swarm via CrewAI)
-- **Backend**: FastAPI + Uvicorn + APScheduler (High-frequency polling)
-- **Data**: yfinance (Live Price/Indices) + BSE/NSE Unofficial APIs
-- **Database**: Supabase (PostgreSQL) with JSONB for raw event storage
-- **Frontend**: React + Vite + Tailwind + Recharts + Framer Motion
+- **Intelligence**: Sarvam-M 24B (Reasoning) & Gemini 2.5 Flash (Parsing) orchestrated by `CrewAI`.
+- **Backend / Pipeline**: FastAPI + Uvicorn Python backend running an APScheduler high-frequency polling loop.
+- **Data Integrations**: `yfinance` (Live Price/Indices), Custom BSE/NSE parsers, `screener_client.py`.
+- **Database**: Supabase (PostgreSQL) leveraging JSONB columns for raw exchange data storage.
+- **Frontend**: React + Vite + CSS Variables (Glassmorphism UI) + Recharts + Framer Motion.
+- **Notifications**: `httpx` direct API integration with Twilio (WhatsApp) and Resend (Email).
 
 ---
 
-## 📊 Database Schema (Auditability)
+## 🏁 Quick Start & Setup
 
-The system is designed for 100% traceability. Every "Signal" you see in the UI points back to a Chain of Custody:
+### 1. Install Dependencies
+```bash
+# Frontend
+cd frontend
+npm install
 
-![SQL Schema Architecture](assets/supabase-schema.png)
+# Backend
+cd backend
+pip install -r requirements.txt
+```
 
+### 2. Environment Variables
+Create a `.env` file in the `backend/` directory using `.env.example` as a template:
+```env
+# AI Models
+SARVAM_API_KEY=your_sarvam_key
+GEMINI_API_KEY=your_gemini_key
 
-1.  **`raw_events`**: Stores the original, unmodified JSON from the exchange.
-2.  **`agent_outputs`**: Stores the raw "thoughts" and sentiment of individual agents.
-3.  **`signals`**: The final, user-facing intelligence result.
+# Database
+SUPABASE_URL=your_project_url
+SUPABASE_KEY=your_service_role_key
+
+# Notifications
+RESEND_API_KEY=your_resend_api_key
+TWILIO_SID=your_twilio_sid
+TWILIO_TOKEN=your_twilio_token
+TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
+ALERT_EMAIL=investor@example.com
+ALERT_WHATSAPP=whatsapp:+919876543210
+```
+
+### 3. Launch the Platform
+Start the backend orchestrator (port 8000) and frontend portal (port 5173) in separate terminals:
+```bash
+# Terminal 1: Backend Swarm
+cd backend
+python main.py
+
+# Terminal 2: Intelligence Portal
+cd frontend
+npm run dev
+```
 
 ---
-
-## 📽 Visual Showcase
-
-### **Autonomous Intelligence Pipeline in Action**
-![Pipeline Trace](assets/pipeline-trace.png)
-
-*Automated detection of a material filing with categorized conviction.*
-
-### **The Backtest Lab**
-![Backtest Simulation](assets/backtest-lab.png)
-
-*Simulating historical agent logic against real RELIANCE price action.*
-
----
-
-## 🏁 Quick Start
-
-1. **Clone & Setup**: `npm install` (frontend) and `pip install -r requirements.txt` (backend).
-2. **Env Connection**: Ensure `SUPABASE_URL` and `GEMINI_API_KEY` are set in `.env`.
-3. **Launch Swarm**: `python main.py` in the backend folder.
-4. **View Portal**: `npm run dev` in the frontend folder.
-
----
-*Created for the ET Gen AI Hackathon 2026. Empowering investors with autonomous, agentic intelligence.*
+*Created for the ET Gen AI Hackathon 2026. Code strictly adheres to provided PRD specifications.*
