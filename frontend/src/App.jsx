@@ -32,6 +32,7 @@ export default function App() {
     return () => window.removeEventListener('globalSearch', handleSearch);
   }, []);  return (
     <div className="app-root">
+      {currentPage === 'landing' && <LandingPage onEnterApp={() => setCurrentPage('home')} />}
       {currentPage === 'home' && <HomePage onNavigate={navigate} />}
       {currentPage === 'signals' && <SignalsPage onNavigate={navigate} searchQuery={searchQuery} />}
       {currentPage === 'detail' && <SignalDetailPage signal={selectedSignal} onBack={() => setCurrentPage('signals')} />}
