@@ -1,0 +1,1 @@
+export default function ConvictionGauge() { return <div>Conviction Gauge</div>; }\n

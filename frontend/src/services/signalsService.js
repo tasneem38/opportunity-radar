@@ -1,0 +1,1 @@
+import { api } from './api'; export const getSignals = () => api.get('/api/signals');\n

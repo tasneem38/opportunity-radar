@@ -1,0 +1,1 @@
+export default function PageContainer({ children }) { return <main className="content-area">{children}</main>; }
