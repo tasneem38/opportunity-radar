@@ -49,7 +49,7 @@ graph TD
 
 ## 🛠 Technical Stack
 
-- **Intelligence**: Gemini 2.5 Flash (Multi-Agent Swarm via CrewAI)
+- **Intelligence**: Sarvam-M 24B (Multi-Agent Swarm via CrewAI)
 - **Backend**: FastAPI + Uvicorn + APScheduler (High-frequency polling)
 - **Data**: yfinance (Live Price/Indices) + BSE/NSE Unofficial APIs
 - **Database**: Supabase (PostgreSQL) with JSONB for raw event storage

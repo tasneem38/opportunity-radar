@@ -2,16 +2,15 @@ from crewai import Agent, LLM
 import os
 import dotenv
 dotenv.load_dotenv()
+
 class BaseAgent:
     def __init__(self):
-        # Using OpenAI-compatible endpoint for Gemini to bypass native provider bugs
+        # Sarvam-M: 24B instruction-tuned model, OpenAI-compatible endpoint
         self.llm = LLM(
-            model="gemini-2.5-flash",
-            provider="openai",
-            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-            api_key=os.getenv("GEMINI_API_KEY")
+            model="openai/sarvam-m",
+            base_url="https://api.sarvam.ai/v1",
+            api_key=os.getenv("SARVAM_API_KEY")
         )
-
 
     def get_agent(self) -> Agent:
         raise NotImplementedError
