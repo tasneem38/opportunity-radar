@@ -23,28 +23,61 @@ WHATSAPP_THRESHOLD   = 9.0
 
 
 def _format_alert_email(signal: dict) -> tuple[str, str]:
-    """Returns (subject, html_body) for the signal."""
-    symbol  = signal.get("stocks", {}).get("symbol", "UNKNOWN") if signal.get("stocks") else signal.get("stock_symbol", "UNKNOWN")
-    score   = signal.get("conviction_score", 0)
-    summary = signal.get("signal_summary", "No summary available.")
-    action  = signal.get("action_suggestion", "Review the signal on the dashboard.")
+    """Returns (subject, html_body) styled after the PRD's Sample Alert Card."""
+    symbol   = signal.get("stocks", {}).get("symbol", "UNKNOWN") if signal.get("stocks") else signal.get("stock_symbol", "UNKNOWN")
+    score    = signal.get("conviction_score", 0)
+    summary  = signal.get("signal_summary", "")
+    action   = signal.get("action_suggestion", "Review the signal on the dashboard.")
+    sector   = signal.get("sector", "")
+    metadata = signal.get("metadata", {})
 
     emoji = "🔴" if score >= 9 else "🟠" if score >= 7 else "🟡"
+    sector_line = f"Sector: {sector}" if sector else ""
 
-    subject = f"{emoji} Opportunity Radar Alert: {symbol} — Score {score:.1f}/10"
+    # Parse contributing signals from metadata if available
+    signals_html = ""
+    for key in ["bulk_deal", "results", "sentiment", "filing"]:
+        val = metadata.get(key, "")
+        if val:
+            label = key.replace("_", " ").title()
+            signals_html += f"<li style='margin-bottom:6px;'>📌 <b>{label}:</b> {val}</li>"
+    if not signals_html:
+        signals_html = f"<li style='margin-bottom:6px;'>📌 {summary}</li>"
+
+    subject = f"{emoji} Opportunity Radar: {symbol} — Score {score:.1f}/10"
     html = f"""
-    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 24px; background: #0f172a; color: #e2e8f0; border-radius: 12px;">
-      <h2 style="color: #38bdf8;">{emoji} High Conviction Signal Detected</h2>
-      <table style="width:100%; border-collapse:collapse; margin-bottom:16px;">
-        <tr><td style="padding:8px 0; color:#94a3b8;">Symbol</td><td style="font-weight:bold; color:#f8fafc;">{symbol}</td></tr>
-        <tr><td style="padding:8px 0; color:#94a3b8;">Conviction Score</td><td style="font-weight:bold; color:#34d399;">{score:.1f} / 10</td></tr>
-      </table>
-      <p style="background:#1e293b; padding:16px; border-radius:8px; color:#cbd5e1;">{summary}</p>
-      <h3 style="color:#f59e0b;">Recommended Action</h3>
-      <p style="color:#e2e8f0;">{action}</p>
-      <hr style="border-color:#334155; margin:24px 0;" />
-      <p style="font-size:11px; color:#475569;">⚠️ Not financial advice. Always do your own research before investing.<br/>
-      Opportunity Radar — ET Gen AI Hackathon 2026</p>
+    <div style="font-family: 'Segoe UI', sans-serif; max-width: 620px; margin: auto; padding: 0; background: #0f172a; color: #e2e8f0; border-radius: 16px; overflow: hidden;">
+      <!-- Header -->
+      <div style="background: linear-gradient(135deg, #1e3a5f, #0f172a); padding: 28px 32px; border-bottom: 2px solid #334155;">
+        <div style="font-size:13px; color:#64748b; text-transform:uppercase; letter-spacing:2px; margin-bottom:6px;">Opportunity Radar</div>
+        <h1 style="margin:0; font-size:22px; color:#f8fafc;">{emoji} HIGH CONVICTION SIGNAL — {symbol}</h1>
+        <div style="margin-top:8px; font-size:15px; color:#94a3b8;">Score: <span style='color:#34d399; font-weight:bold;'>{score:.1f}/10</span>&nbsp;&nbsp;|&nbsp;&nbsp;{sector_line}</div>
+      </div>
+
+      <!-- Signals Detected -->
+      <div style="padding: 24px 32px; border-bottom: 1px solid #1e293b;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#64748b; margin-bottom:12px;">Signals Detected</div>
+        <ul style="margin:0; padding-left:8px; list-style:none; color:#cbd5e1; font-size:14px; line-height:1.8;">
+          {signals_html}
+        </ul>
+      </div>
+
+      <!-- What This Means -->
+      <div style="padding: 24px 32px; border-bottom: 1px solid #1e293b;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#64748b; margin-bottom:12px;">What This Means</div>
+        <p style="margin:0; font-size:14px; color:#cbd5e1; line-height:1.7;">{summary if summary else action}</p>
+      </div>
+
+      <!-- Action -->
+      <div style="padding: 24px 32px; border-bottom: 1px solid #1e293b;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:#64748b; margin-bottom:12px;">Recommended Action</div>
+        <p style="margin:0; font-size:14px; color:#f8fafc; font-weight:500;">{action}</p>
+      </div>
+
+      <!-- Footer -->
+      <div style="padding: 16px 32px; background: #020617;">
+        <p style="margin:0; font-size:11px; color:#475569;">⚠️ Not financial advice. Research before investing. | Opportunity Radar</p>
+      </div>
     </div>
     """
     return subject, html
@@ -79,16 +112,43 @@ def send_email_alert(signal: dict) -> bool:
 
 
 def _format_whatsapp_message(signal: dict) -> str:
-    """Returns a 3-line WhatsApp summary string."""
-    symbol  = signal.get("stocks", {}).get("symbol", "UNKNOWN") if signal.get("stocks") else signal.get("stock_symbol", "UNKNOWN")
-    score   = signal.get("conviction_score", 0)
-    action  = signal.get("action_suggestion", "Review the dashboard.")
+    """Returns a multi-section WhatsApp message matching the PRD's Alert Card format."""
+    symbol   = signal.get("stocks", {}).get("symbol", "UNKNOWN") if signal.get("stocks") else signal.get("stock_symbol", "UNKNOWN")
+    score    = signal.get("conviction_score", 0)
+    summary  = signal.get("signal_summary", "")
+    action   = signal.get("action_suggestion", "Review the dashboard.")
+    metadata = signal.get("metadata", {})
+    sector   = metadata.get("sector", "") if metadata else ""
+
+    emoji = "🔴" if score >= 9 else "🟠" if score >= 7 else "🟡"
+
+    # Build signals detected list
+    signals_lines = []
+    for key in ["bulk_deal", "results", "sentiment", "filing"]:
+        val = metadata.get(key, "") if metadata else ""
+        if val:
+            label = key.replace("_", " ").title()
+            signals_lines.append(f"  📌 {label}: {val}")
+    if not signals_lines:
+        signals_lines.append(f"  📌 {summary or action}")
+
+    sector_line = f"Sector: {sector}  |  " if sector else ""
+    signals_block = "\n".join(signals_lines)
 
     return (
-        f"🔴 *OPPORTUNITY RADAR — HIGH CONVICTION ALERT*\n"
-        f"*{symbol}* | Score: {score:.1f}/10\n"
-        f"{action}\n\n"
-        f"⚠️ Not financial advice."
+        f"{emoji} *HIGH CONVICTION SIGNAL — {symbol}*\n"
+        f"Score: *{score:.1f}/10*  |  {sector_line}Opportunity Radar\n"
+        f"\n"
+        f"*SIGNALS DETECTED*\n"
+        f"{signals_block}\n"
+        f"\n"
+        f"*WHAT THIS MEANS*\n"
+        f"{summary if summary else action}\n"
+        f"\n"
+        f"*RECOMMENDED ACTION*\n"
+        f"{action}\n"
+        f"\n"
+        f"⚠️ Not financial advice. Research before investing."
     )
 
 
