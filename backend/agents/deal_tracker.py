@@ -8,7 +8,7 @@ class DealTrackerAgent(BaseAgent):
             role="Institutional Deal Flow Analyst",
             goal="Identify institutional accumulation or distribution patterns in NSE bulk and block deals.",
             backstory="Specialist in tracking smart money movements and supply absorption patterns.",
-            llm=self.llm,
+            llm=self.fast_llm,
             verbose=True,
             allow_delegation=False
         )

@@ -9,7 +9,7 @@ class FilingWatcherAgent(BaseAgent):
             goal="Identify material non-routine corporate disclosures that impact stock price.",
             backstory="Experienced SEBI-certified analyst specializing in corporate announcements. You are highly decisive and provide sharp conviction scores (0-10) based on how 'material' a disclosure really is for an institutional investor.",
 
-            llm=self.llm,
+            llm=self.fast_llm,
             verbose=True,
             allow_delegation=False
         )

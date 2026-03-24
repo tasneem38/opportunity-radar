@@ -19,3 +19,5 @@ resend
 twilio
 pypdf
 pymupdf
+litellm
+langchain-openai
