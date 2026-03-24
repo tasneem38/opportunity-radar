@@ -18,7 +18,7 @@ TWILIO_FROM        = os.getenv("TWILIO_WHATSAPP_FROM", "whatsapp:+14155238886")
 ALERT_EMAIL        = os.getenv("ALERT_EMAIL", "")
 ALERT_WHATSAPP     = os.getenv("ALERT_WHATSAPP", "")
 
-EMAIL_THRESHOLD      = 9.0
+EMAIL_THRESHOLD      = 7.0
 WHATSAPP_THRESHOLD   = 9.0
 
 
