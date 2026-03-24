@@ -50,7 +50,14 @@ export default function WatchlistPage({ onBack }) {
                          {item.change}
                        </td>
                        <td style={{ padding: '1rem' }}>
-                         <Badge variant={item.sentiment === 'Bullish' ? 'success' : 'info'}>{item.sentiment}</Badge>
+                         <Badge 
+                           variant={
+                             item.sentiment?.toLowerCase().includes('bull') ? 'success' :
+                             item.sentiment?.toLowerCase().includes('bear') ? 'danger' : 'info'
+                           }
+                         >
+                           {item.sentiment}
+                         </Badge>
                        </td>
                      </tr>
                    ))}
