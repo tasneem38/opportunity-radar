@@ -5,7 +5,7 @@ export default function Navbar({ onSearch }) {
   return (
     <nav className="navbar">
       <div className="nav-container">
-        <div className="nav-brand">
+        <div className="nav-brand" onClick={() => window.dispatchEvent(new CustomEvent('globalNavigate', { detail: 'landing' }))} style={{ cursor: 'pointer' }}>
           <Brain className="logo-icon" />
           <span className="brand-text">Opportunity Radar</span>
         </div>

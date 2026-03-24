@@ -4,9 +4,10 @@ import SignalDetailPage from './pages/SignalDetailPage';
 import WatchlistPage from './pages/WatchlistPage';
 import BacktestPage from './pages/BacktestPage';
 import SignalsPage from './pages/SignalsPage';
+import LandingPage from './pages/LandingPage';
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState('landing');
   const [selectedSignal, setSelectedSignal] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -28,8 +29,15 @@ export default function App() {
       setSearchQuery(e.detail);
       setCurrentPage('signals');
     };
+    const handleNav = (e) => {
+      setCurrentPage(e.detail);
+    };
     window.addEventListener('globalSearch', handleSearch);
-    return () => window.removeEventListener('globalSearch', handleSearch);
+    window.addEventListener('globalNavigate', handleNav);
+    return () => {
+      window.removeEventListener('globalSearch', handleSearch);
+      window.removeEventListener('globalNavigate', handleNav);
+    };
   }, []);  return (
     <div className="app-root">
       {currentPage === 'landing' && <LandingPage onEnterApp={() => setCurrentPage('home')} />}

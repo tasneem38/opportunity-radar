@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import './landing.css';
+import '../landing.css';
 
 export default function LandingPage({ onEnterApp }) {
   useEffect(() => {
