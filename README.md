@@ -49,7 +49,7 @@ graph TD
 
 ## 🛠 Technical Stack
 
-- **Intelligence**: Gemini 1.5 Flash (Multi-Agent Swarm via CrewAI)
+- **Intelligence**: Gemini 2.5 Flash (Multi-Agent Swarm via CrewAI)
 - **Backend**: FastAPI + Uvicorn + APScheduler (High-frequency polling)
 - **Data**: yfinance (Live Price/Indices) + BSE/NSE Unofficial APIs
 - **Database**: Supabase (PostgreSQL) with JSONB for raw event storage
@@ -61,7 +61,8 @@ graph TD
 
 The system is designed for 100% traceability. Every "Signal" you see in the UI points back to a Chain of Custody:
 
-![SQL Schema Architecture](/c:/Users/sh29t/Desktop/Projects/opportunity_radar/opportunity-radar/assets/supabase-schema.png)
+![SQL Schema Architecture](assets/supabase-schema.png)
+
 
 1.  **`raw_events`**: Stores the original, unmodified JSON from the exchange.
 2.  **`agent_outputs`**: Stores the raw "thoughts" and sentiment of individual agents.
@@ -72,11 +73,13 @@ The system is designed for 100% traceability. Every "Signal" you see in the UI p
 ## 📽 Visual Showcase
 
 ### **Autonomous Intelligence Pipeline in Action**
-![Pipeline Trace](file:///C:/Users/sh29t/.gemini/antigravity/brain/7c63632b-1deb-4b8f-85f0-fe85bfac8468/media__1774359928084.png)
+![Pipeline Trace](assets/pipeline-trace.png)
+
 *Automated detection of a material filing with categorized conviction.*
 
 ### **The Backtest Lab**
-![Backtest Simulation](file:///C:/Users/sh29t/.gemini/antigravity/brain/7c63632b-1deb-4b8f-85f0-fe85bfac8468/media__1774365542576.png)
+![Backtest Simulation](assets/backtest-lab.png)
+
 *Simulating historical agent logic against real RELIANCE price action.*
 
 ---
