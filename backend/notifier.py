@@ -34,15 +34,24 @@ def _format_alert_email(signal: dict) -> tuple[str, str]:
     emoji = "🔴" if score >= 9 else "🟠" if score >= 7 else "🟡"
     sector_line = f"Sector: {sector}" if sector else ""
 
-    # Parse contributing signals from metadata if available
+    # Build SIGNALS DETECTED from metadata fields
     signals_html = ""
-    for key in ["bulk_deal", "results", "sentiment", "filing"]:
-        val = metadata.get(key, "")
-        if val:
-            label = key.replace("_", " ").title()
-            signals_html += f"<li style='margin-bottom:6px;'>📌 <b>{label}:</b> {val}</li>"
+    category = metadata.get("category", "") if metadata else ""
+    sentiment = metadata.get("sentiment", "") if metadata else ""
+    filing    = metadata.get("filing", "")   if metadata else ""
+    severity  = metadata.get("severity", "") if metadata else ""
+
+    if category:
+        signals_html += f"<li style='margin-bottom:6px;'>📌 <b>Category:</b> {category}</li>"
+    if sentiment:
+        color = "#34d399" if "bull" in sentiment.lower() else "#f87171" if "bear" in sentiment.lower() else "#94a3b8"
+        signals_html += f"<li style='margin-bottom:6px;'>📌 <b>Sentiment:</b> <span style='color:{color};'>{sentiment}</span></li>"
+    if severity:
+        signals_html += f"<li style='margin-bottom:6px;'>📌 <b>Severity:</b> {severity}/5</li>"
+    if filing and filing != summary:
+        signals_html += f"<li style='margin-bottom:6px;'>📌 <b>Signal:</b> {filing[:120]}{'...' if len(str(filing)) > 120 else ''}</li>"
     if not signals_html:
-        signals_html = f"<li style='margin-bottom:6px;'>📌 {summary}</li>"
+        signals_html = f"<li style='margin-bottom:6px;'>📌 {summary or 'Material filing detected.'}</li>"
 
     subject = f"{emoji} Opportunity Radar: {symbol} — Score {score:.1f}/10"
     html = f"""
@@ -122,15 +131,20 @@ def _format_whatsapp_message(signal: dict) -> str:
 
     emoji = "🔴" if score >= 9 else "🟠" if score >= 7 else "🟡"
 
-    # Build signals detected list
+    # Build SIGNALS DETECTED from metadata fields
+    category = metadata.get("category", "") if metadata else ""
+    sentiment = metadata.get("sentiment", "") if metadata else ""
+    filing    = metadata.get("filing", "")   if metadata else ""
+    severity  = metadata.get("severity", "") if metadata else ""
+
     signals_lines = []
-    for key in ["bulk_deal", "results", "sentiment", "filing"]:
-        val = metadata.get(key, "") if metadata else ""
-        if val:
-            label = key.replace("_", " ").title()
-            signals_lines.append(f"  📌 {label}: {val}")
+    if category:  signals_lines.append(f"  📌 Category: {category}")
+    if sentiment: signals_lines.append(f"  📌 Sentiment: {sentiment}")
+    if severity:  signals_lines.append(f"  📌 Severity: {severity}/5")
+    if filing and filing != summary:
+        signals_lines.append(f"  📌 Signal: {str(filing)[:100]}")
     if not signals_lines:
-        signals_lines.append(f"  📌 {summary or action}")
+        signals_lines.append(f"  📌 {summary or 'Material filing detected.'}")
 
     sector_line = f"Sector: {sector}  |  " if sector else ""
     signals_block = "\n".join(signals_lines)

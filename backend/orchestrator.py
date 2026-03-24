@@ -152,12 +152,20 @@ class OpportunityRadarOrchestrator:
 
                     # 5. Dispatch alerts (Email >= 7 | WhatsApp >= 9)
                     try:
+                        company_name = s.get("company_name", symbol)
                         dispatch_signal = {
                             "conviction_score": signal_data["confidence_score"],
-                            "stock_symbol": symbol,
-                            "stocks": {"symbol": symbol},
-                            "signal_summary": s.get("signal", s.get("action", "New material signal detected")),
-                            "action_suggestion": s.get("action", "Review signal on the dashboard.")
+                            "stock_symbol": company_name,    # use name not scrip code
+                            "stocks": {"symbol": company_name},
+                            "signal_summary": s.get("signal", ""),  # 2-sentence explanation
+                            "action_suggestion": s.get("action", "Review signal on the dashboard."),
+                            "sector": s.get("sector", ""),
+                            "metadata": {
+                                "category": s.get("category", "Filing"),
+                                "sentiment": s.get("sentiment", "Neutral"),
+                                "severity": s.get("severity", ""),
+                                "filing": s.get("signal", ""),  # filing detail
+                            }
                         }
                         dispatch_alert(dispatch_signal)
                     except Exception as notify_err:
