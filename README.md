@@ -113,4 +113,4 @@ npm run dev
 ```
 
 ---
-*Created for the ET Gen AI Hackathon 2026. Code strictly adheres to provided PRD specifications.*
+*Created for the ET Gen AI Hackathon 2026.*
