@@ -1,0 +1,1 @@
+export const scoreColor = (score) => score >= 8 ? 'text-red-600' : score >= 6 ? 'text-orange-500' : 'text-green-500';\n

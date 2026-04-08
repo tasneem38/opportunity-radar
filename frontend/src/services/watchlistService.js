@@ -1,0 +1,1 @@
+import { api } from './api'; export const getWatchlist = () => api.get('/api/watchlist');\n

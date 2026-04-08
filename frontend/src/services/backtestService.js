@@ -1,0 +1,1 @@
+import { api } from './api'; export const runBacktest = () => api.get('/api/backtest');\n
