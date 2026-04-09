@@ -3,9 +3,9 @@ from fastapi import FastAPI
 
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-from api.routes_signals import router as signals_router
-from api.routes_watchlist import router as watchlist_router
-from api.routes_backtest import router as backtest_router
+from backend.api.routes_signals import router as signals_router
+from backend.api.routes_watchlist import router as watchlist_router
+from backend.api.routes_backtest import router as backtest_router
 from loguru import logger
 
 def create_app() -> FastAPI:
@@ -18,6 +18,12 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     async def startup_event():
+        import os
+        # Skip background scheduler on Vercel (use Cron Jobs instead)
+        if os.getenv("VERCEL"):
+            logger.info("Running on Vercel - Skipping background scheduler.")
+            return
+
         try:
             from orchestrator import orchestrator
             asyncio.create_task(orchestrator.start())
@@ -27,6 +33,22 @@ def create_app() -> FastAPI:
 
     @app.get("/health")
     def health(): return {"status": "ok"}
+
+    # Vercel Cron Job Triggers
+    @app.get("/api/jobs/filing")
+    async def trigger_filing_job():
+        from orchestrator import orchestrator
+        logger.info("Manual trigger for Filing Pipeline")
+        asyncio.create_task(orchestrator.run_filing_pipeline())
+        return {"status": "Filing pipeline triggered"}
+
+    @app.get("/api/jobs/daily_events")
+    async def trigger_daily_events_job():
+        from orchestrator import orchestrator
+        logger.info("Manual trigger for Daily Events Pipeline")
+        asyncio.create_task(orchestrator.run_daily_events_pipeline())
+        return {"status": "Daily events pipeline triggered"}
+
     return app
 
 
